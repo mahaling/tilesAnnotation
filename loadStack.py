@@ -3,6 +3,8 @@
 
 import os, sys, json
 import urllib
+import matplotlib.pyplot as plt
+import cv2, PIL
 
 
 def loadTileSpecs(stack,z):
@@ -15,10 +17,39 @@ def loadTileSpecs(stack,z):
     data = json.loads(f.read())
     return data
 
-def loadTileData(stackJsonData):
-    tileData = []
-    for jt in stackJsonData:
-        
+def loadTileData(stackJsonData,stack):
+    tileData = {}
+    for i,jt in enumerate(stackJsonData):
+        td = {}
+        td["z"] = jt["z"]
+        td["id"] = i
+        td["tileId"] = jt["tileId"]
+        td["height"] = jt["height"]
+        td["width"] = jt["width"]
+        td["minX"] = jt["minX"]
+        td["minY"] = jt["minY"]
+        td["maxX"] = jt["maxX"]
+        td["maxY"] = jt["maxY"]
+        sectionId = jt["layout"]["sectionId"]
+        # Not used at the moment
+        #td["camera"] = jt["layout"]["camera"]
+        #td["stageX"] = jt["layout"]["stageX"]
+        #td["stageY"] = jt["layout"]["stageY"]
+        #td["imageRow"] = jt["layout"]["imageRow"]
+        #td["imageCol"] = jt["layout"]["imageCol"]
+        #td["owner"] = stack["owner"]
+        #td["project"] = stack["project"]
+        #td["stackname"] = stack["stackname"]
+        tileData[sectionId] = td
+    return tileData
+
+def convertPolygonPoints(points,bounds):
+    # points is an array of coordinates representing the polygon with first and last point being the same
+    bounds_width = bounds['maxX']-bounds['minX']
+    bounds_height = bounds['maxY']-bounds['minY']
+
+
+
 
 if __name__ == '__main__':
     stack = {}
@@ -26,9 +57,48 @@ if __name__ == '__main__':
     stack["owner"] = "gayathri"
     stack["project"] = "EM_Phase1"
     stack["stackname"] = "Phase1RawData_AIBS"
+    downsampledImgPath = "/data/em-131fs/gayathri/downsampledSections"
+    ext = "jpg"
     z = 2267
 
     tileSpecs = loadTileSpecs(stack,z)
+    #print tileSpecs[0]
+
+    # get the bounds of all tiles in this section
+    tileData = loadTileData(tileSpecs,stack)
+    print tileData[0]
+
+    # Read the downscaled image of each section
+    files = os.listdir(downsampledImgPath)
+
+    for f in files:
+        f = os.path.join(downsampledImgPath, f)
+        if (os.path.isfile(f) and f.endswith(ext)):
+            section = f[len(downsampledImgPath)+1:-3] + '0'
+
+            # read the down sampled image
+            #img = cv2.imread(f)
+            #img_width = img.shape[1]
+            #img_height = img.shape[0]
+
+            # compute width and height of the bounds of the section
+            #bounds_width = bounds['maxX']-bounds['minX']
+            #bounds_height = bounds['maxY']-bounds['minY']
+
+            # compute the scale between the original size and the downsampled image
+            #scale = img_width*1.0/bounds_width
+
+            # set up the image canvas to show the downscaled image and get the polgon roi
+            canvasImage = Canvas(f)
+
+            bounds = {}
+            bounds["minX"] = tileData[section]['minX']
+            bounds["minY"] = tileData[section]['minY']
+            bounds["maxX"] = tileData[section]['maxX']
+            bounds["maxY"] = tileData[section]['maxY']
+
+            # show the image and collect the polygon points
+            canvasImage.getCoord()
 
     # get section ID
     sectionId = tileSpecs[0]["layout"]["sectionId"]
