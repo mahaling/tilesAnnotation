@@ -91,15 +91,15 @@ if __name__ == '__main__':
     z = 2267
 
     tileSpecs = loadTileSpecs(stack,z)
-    print tileSpecs[0]
+    #print tileSpecs[0]
 
     # get section ID
     sectionId = tileSpecs[0]["layout"]["sectionId"]
-    print sectionId
+    #print sectionId
 
     # get the bounds of all tiles in this section
     tileData = loadTileData(tileSpecs,stack)
-    print tileData[sectionId]
+    #print tileData[sectionId]
 
     # Read the downscaled image of each section
     files = os.listdir(downsampledImgPath)
@@ -122,14 +122,16 @@ if __name__ == '__main__':
             # compute the scale between the original size and the downsampled image
             #scale = img_width*1.0/bounds_width
 
-            # set up the image canvas to show the downscaled image and get the polgon roi
-            canvasImage = imageCanvas(f)
-
             bounds = {}
             bounds["minX"] = tileData[section]['minX']
             bounds["minY"] = tileData[section]['minY']
             bounds["maxX"] = tileData[section]['maxX']
             bounds["maxY"] = tileData[section]['maxY']
 
+            # set up the image canvas to show the downscaled image and get the polgon roi
+            canvasImage = imageCanvas(f)
+
             # show the image and collect the polygon points. The polygon points are saved in the canvas object
-            canvasImage.getCoord()
+            #canvasImage.getCoord()
+            canvasImage.showImage()
+            print len(canvasImage.polygon)

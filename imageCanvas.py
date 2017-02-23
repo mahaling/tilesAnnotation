@@ -7,35 +7,44 @@ from matplotlib.mlab import dist_point_to_segment
 #from matplotlib.line import Lines2D
 
 class Polygon():
-    self.coords = []
-    self.start_point = ()
-    self.end_point = ()
-    self.roicolor = 'r'
+    def __init__(self):
+        self.coords = []
+        self.start_point = ()
+        self.end_point = ()
+        self.roicolor = 'r'
 
 class imageCanvas():
-    def __init__(self,image,bounds):
+    def __init__(self,image):
         self.fname = image
         self.img = cv2.imread(self.fname)
         self.img_width = self.img.shape[1]
         self.img_height = self.img.shape[0]
-        self.bounds = bounds
+        #self.bounds = bounds
         print self.img.shape
         self.point = ()
         self.polygon = []
         self.newPoly = Polygon()
 
-
         # all variables that are required for polygon
         self.previous_point = []
         self.line = None
 
+    def showImage(self):
+        self.fig = plt.figure()
+        ax = self.fig.add_subplot(111)
+        ax.set_title(self.fname)
+        plt.imshow(self.img)
+        self.__ID1 = self.fig.canvas.mpl_connect('motion_notify_event',self.__motion_notify_callback)
+        self.__ID2 = self.fig.canvas.mpl_connect('button_press_event',self.__button_press_callback)
+        self.__ID3 = self.fig.canvas.mpl_connect('close_event',self.__handle_close)
+        plt.show()
 
     def getCoord(self):
         self.fig = plt.figure()
-        ax = fig.add_subplot(111)
+        ax = self.fig.add_subplot(111)
         ax.set_title(self.fname)
         plt.imshow(self.img)
-        cid = fig.canvas.mpl_connect('button_press_event', self.__onclick__)
+        cid = self.fig.canvas.mpl_connect('button_press_event', self.__onclick__)
         plt.show()
         return self.point
 
@@ -44,13 +53,23 @@ class imageCanvas():
         print self.point
         return self.point
 
+    def __motion_notify_callback(self,event):
+        if event.inaxes:
+            ax = event.inaxes
+            x,y = event.xdata, event.ydata
+            if (event.button == None or event.button == 1) and self.line != None:
+                self.line.set_data([self.previous_point[0],x],
+                                    [self.previous_point[1],y])
+                self.fig.canvas.draw()
+
     def __button_press_callback(self,event):
         if event.inaxes:
-            x,y = evet.xdata,event.ydata
+            x,y = event.xdata,event.ydata
             ax = event.inaxes
             if event.button == 1 and event.dblclick == False: # pressed the left button and it is a single click
                 if self.line == None: # if there is no line, create a line
-                    self.line = plt.Line2D([x,x], [y,y], marker='o', color=self.roicolor)
+                    self.newPoly = Polygon()
+                    self.line = plt.Line2D([x,x], [y,y], marker='o', color=self.newPoly.roicolor)
                     self.previous_point = [x,y]
                     self.newPoly.coords.append([x,y])
                     self.newPoly.start_point = (x,y)
@@ -59,7 +78,7 @@ class imageCanvas():
                 else: # if there is a line, then create a line segment (the polygon is already initialized)
                     self.line = plt.Line2D([self.previous_point[0], x],
                                            [self.previous_point[1], y],
-                                           marker='o', color=newPoly.roicolor)
+                                           marker='o', color=self.newPoly.roicolor)
                     self.previous_point = [x,y]
                     self.newPoly.coords.append([x,y])
                     event.inaxes.add_line(self.line)
@@ -69,21 +88,34 @@ class imageCanvas():
                   # add the polgon to the list of polygons
                   # complete the line connecting the start and the end point
                   # display the image
-                  self.line.set_data([])
+                  self.line.set_data([self.previous_point[0],
+                                      self.newPoly.start_point[0]],
+                                     [self.previous_point[1],
+                                      self.newPoly.start_point[1]])
+                  ax.add_line(self.line)
+                  self.fig.canvas.draw()
+                  self.line = None
+                  self.newPoly.end_point = self.previous_point
+                  # you can either opt to append the first point again at the end of newPoly.coords or just leave it
+                  self.polygon.append(self.newPoly)
 
-    def convertPolygonPointsToWorld(self):
-        bounds_width = self.bounds['maxX'] - self.bounds['minX']
-        bounds_height = self.bounds['maxY'] - self.bounds['minY']
+    def __handle_close(self,event):
+        print('Closed figure!')
+        print self.polygon
 
-        # compute the scale between downscaled and original section
-        scale = self.img_width*1.0/bounds_width
-
-        # check if polygon points have been chosen
-        coords = [[]]
-        if self.polygon:
-            for x,y in self.polygon:
-                # convert the points to world coordinates
-                x = (x/scale) + bounds['minX']
-                y = (y/scale) + bounds['minY']
-                coords[0].append([x,y])
-        return coords
+    #def convertPolygonPointsToWorld(self):
+    #    bounds_width = self.bounds['maxX'] - self.bounds['minX']
+    #    bounds_height = self.bounds['maxY'] - self.bounds['minY']
+    #
+    #    # compute the scale between downscaled and original section
+    #    scale = self.img_width*1.0/bounds_width
+    #
+    #    # check if polygon points have been chosen
+    #    coords = [[]]
+    #    if self.polygon:
+    #        for x,y in self.polygon:
+    #            # convert the points to world coordinates
+    #            x = (x/scale) + bounds['minX']
+    #            y = (y/scale) + bounds['minY']
+    #            coords[0].append([x,y])
+    #    return coords
