@@ -9,6 +9,7 @@ from matplotlib.mlab import dist_point_to_segment
 class Polygon():
     def __init__(self):
         self.coords = []
+        self.worldCoords = []
         self.start_point = ()
         self.end_point = ()
         self.roicolor = 'r'
@@ -103,19 +104,22 @@ class imageCanvas():
         print('Closed figure!')
         print self.polygon
 
-    #def convertPolygonPointsToWorld(self):
-    #    bounds_width = self.bounds['maxX'] - self.bounds['minX']
-    #    bounds_height = self.bounds['maxY'] - self.bounds['minY']
-    #
-    #    # compute the scale between downscaled and original section
-    #    scale = self.img_width*1.0/bounds_width
-    #
-    #    # check if polygon points have been chosen
-    #    coords = [[]]
-    #    if self.polygon:
-    #        for x,y in self.polygon:
-    #            # convert the points to world coordinates
-    #            x = (x/scale) + bounds['minX']
-    #            y = (y/scale) + bounds['minY']
-    #            coords[0].append([x,y])
-    #    return coords
+    def convertPolygonPointsToWorld(self,stackBounds):
+        bounds_width = stackBounds['maxX'] - stackBounds['minX']
+        bounds_height = stackBounds['maxY'] - stackBounds['minY']
+
+        # compute the scale between downscaled and original section
+        scale = self.img_width*1.0/bounds_width
+
+        # check if polygon points have been chosen
+        coords = [[]]
+        if len(self.polygon) > 0:
+            #for i in xrange(0,len(self.polygon)-1):
+            #    for j in xrange(0,len(self.polygon[i].coords)-1):
+            for i,poly in enumerate(self.polygon):
+                for x,y in poly:
+                    # convert the points to world coordinates
+                    x = (x/scale) + bounds['minX']
+                    y = (y/scale) + bounds['minY']
+                    self.polygon[i].worldCoords.append([x,y])
+        

@@ -9,8 +9,13 @@ import numpy as np
 import cv2, PIL
 from imageCanvas import *
 
+def getSectionBounds(stack,z):
+    urlChar = stack["baseUrl"] + '/owner/' + stack["owner"] + '/project/' + stack["project"] + '/stack/' + stack["stackname"] + '/z/' + str(z) + '/bounds'
+    f = urllib.urlopen(urlChar)
+    data = json.loads(f.read())
+    return data
 
-def loadTileSpecs(stack,z):
+def getTileSpecs(stack,z):
     # stack - a structure that contains the baseUrl, owner, project, stackname, etc.
     # z - z-value of the section
 
@@ -90,8 +95,11 @@ if __name__ == '__main__':
     ext = "jpg"
     z = 2267
 
-    tileSpecs = loadTileSpecs(stack,z)
+    tileSpecs = getTileSpecs(stack,z)
     #print tileSpecs[0]
+
+    # get section bounds
+    secBounds = getSectionBounds(stack,z)
 
     # get section ID
     sectionId = tileSpecs[0]["layout"]["sectionId"]
@@ -122,11 +130,11 @@ if __name__ == '__main__':
             # compute the scale between the original size and the downsampled image
             #scale = img_width*1.0/bounds_width
 
-            bounds = {}
-            bounds["minX"] = tileData[section]['minX']
-            bounds["minY"] = tileData[section]['minY']
-            bounds["maxX"] = tileData[section]['maxX']
-            bounds["maxY"] = tileData[section]['maxY']
+            tileBounds = {}
+            tileBounds["minX"] = tileData[section]['minX']
+            tileBounds["minY"] = tileData[section]['minY']
+            tileBounds["maxX"] = tileData[section]['maxX']
+            tileBounds["maxY"] = tileData[section]['maxY']
 
             # set up the image canvas to show the downscaled image and get the polgon roi
             canvasImage = imageCanvas(f)
@@ -134,4 +142,4 @@ if __name__ == '__main__':
             # show the image and collect the polygon points. The polygon points are saved in the canvas object
             #canvasImage.getCoord()
             canvasImage.showImage()
-            print len(canvasImage.polygon)
+            print len(canvasImage.polygon[0].coords)
