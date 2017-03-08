@@ -14,6 +14,12 @@ class Polygon():
         self.end_point = ()
         self.roicolor = 'r'
 
+    def getScreenCoords(self):
+        return self.coords
+
+    def getWorldCoords(self):
+        return self.worldCoords
+
 class imageCanvas():
     def __init__(self,image):
         self.fname = image
@@ -101,12 +107,13 @@ class imageCanvas():
                   self.polygon.append(self.newPoly)
 
     def __handle_close(self,event):
-        print('Closed figure!')
-        print self.polygon
+        print "Closing figure!"
+        #print self.polygon
 
-    def convertPolygonPointsToWorld(self,stackBounds):
-        bounds_width = stackBounds['maxX'] - stackBounds['minX']
-        bounds_height = stackBounds['maxY'] - stackBounds['minY']
+    def convertPolygonPointsToWorld(self,sectionBounds):
+        # converts the screen coordinates to world coordinates
+        bounds_width = sectionBounds['maxX'] - sectionBounds['minX']
+        bounds_height = sectionBounds['maxY'] - sectionBounds['minY']
 
         # compute the scale between downscaled and original section
         scale = self.img_width*1.0/bounds_width
@@ -117,9 +124,8 @@ class imageCanvas():
             #for i in xrange(0,len(self.polygon)-1):
             #    for j in xrange(0,len(self.polygon[i].coords)-1):
             for i,poly in enumerate(self.polygon):
-                for x,y in poly:
+                for x,y in poly.coords:
                     # convert the points to world coordinates
-                    x = (x/scale) + bounds['minX']
-                    y = (y/scale) + bounds['minY']
+                    x = (x/scale) + sectionBounds['minX']
+                    y = (y/scale) + sectionBounds['minY']
                     self.polygon[i].worldCoords.append([x,y])
-        
