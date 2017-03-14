@@ -18,11 +18,12 @@ if __name__ == '__main__':
     stack["project"] = "EM_Phase1"
     stack["stackname"] = "Phase1RawData_AIBS"
 
+    targetstack = {}
     targetstack["baseUrl"] = "http://em-131fs:8080/render-ws/v1"
     targetstack["owner"] = "gayathri"
     targetstack["project"] = "EM_Phase1"
     targetstack["stackname"] = "PolygonTest"
-    
+
     downsampledImgPath = "/data/em-131fs/gayathri/downsampledSections"
     ext = "jpg"
     z = 2267
