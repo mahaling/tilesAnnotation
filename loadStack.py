@@ -17,6 +17,12 @@ if __name__ == '__main__':
     stack["owner"] = "gayathri"
     stack["project"] = "EM_Phase1"
     stack["stackname"] = "Phase1RawData_AIBS"
+
+    targetstack["baseUrl"] = "http://em-131fs:8080/render-ws/v1"
+    targetstack["owner"] = "gayathri"
+    targetstack["project"] = "EM_Phase1"
+    targetstack["stackname"] = "PolygonTest"
+    
     downsampledImgPath = "/data/em-131fs/gayathri/downsampledSections"
     ext = "jpg"
     z = 2267
@@ -60,6 +66,10 @@ if __name__ == '__main__':
             print canvasImage.polygon[0].worldCoords
             tileIDs = sp.selectTilesInsidePolygon(canvasImage.polygon[0].worldCoords, tileBounds)
             print tileIDs
+
+            # extract the tile specs corresponding to these tileIDs
+            tileSpecs = sp.getTileSpecsFromTileID(stack,tileIDs)
+            print tileSpecs
 
 
 #    for f in files:

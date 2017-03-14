@@ -37,6 +37,17 @@ class stackPointConversion():
 
         return tileSpecs
 
+    def getTileSpecsFromTileID(self, stack, tileIDs):
+        # get the list of tilespecs corresponding to tileIDs from "stack"
+        print tileIDs
+        tileSpecs = []
+        for tileID in tileIDs:
+            urlChar = stack["baseUrl"] + '/owner/' + stack["owner"] + '/project/' + stack["project"] + '/stack/' + stack["stackname"] + '/tile/' + tileID
+            f = urllib.urlopen(urlChar)
+            tileSpec = json.loads(f.read())
+            tileSpecs.append(tileSpec)
+        return tileSpecs
+
 
     def loadTileData(self,stackJsonData,stack):
         tileData = {}
