@@ -5,6 +5,7 @@
   "sourceStack":"Phase1RawData_AIBS",
   "targetStack":"PolygonTest",
   "downsampledImgPath":"/data/em-131fs/gayathri/downsampledSections",
+  "ext":"jpg",
   "annotateAll":0,
   "imgExt":"jpg",
   "startZ":2267,
