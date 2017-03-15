@@ -56,6 +56,10 @@ def extractAndLoadTilesFromSection(filenames, params, screenCoords, r):
         # assumes that the downsampled images are named after their z value
         z = int(f[len(params["downsampledImgPath"])+1:-4])
 
+        # do not write those sections that are not in the specified range
+        if not (params["minZ"] <= z <= params["maxZ"]):
+            continue
+
         # Get tile specs this is required to reupload sections with only selected tiles
         tilespecs = renderapi.tilespec.get_tile_specs_from_z(
             params["sourceStack"], z, render=r)
@@ -139,11 +143,11 @@ if __name__ == '__main__':
             except IndexError:
                 continue
             break
-            
+
     tsjsons = extractAndLoadTilesFromSection(files, params, screenCoords, r)
     #tsjsons.append(tsjson)
 
-    renderapi.stack.create_stack(targetStack, render=r)
+    renderapi.stack.create_stack(params["targetStack"], render=r)
     # upload tilespecs -- TODO add pool setup
     renderapi.client.import_jsonfiles_parallel(
         params["targetStack"], tsjsons, poolsize=10, render=r)
