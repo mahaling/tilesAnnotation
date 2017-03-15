@@ -8,6 +8,6 @@
   "ext":"jpg",
   "annotateAll":0,
   "imgExt":"jpg",
-  "startZ":2267,
-  "endZ":2267
+  "minZ":2267,
+  "maxZ":2276
 }
