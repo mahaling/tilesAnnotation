@@ -73,7 +73,7 @@ def extractAndLoadTilesFromSection(filenames, params, screenCoords, r):
         sectionId = tilespecs[0].layout.sectionId
 
         # PIL doesn't read the entire image... We just need the image dimensions
-        with Image.open(filepath) as img:
+        with Image.open(f) as img:
             img_width, img_height = img.size
         #img = cv2.imread(f)
         #img_width = img.shape[1]
