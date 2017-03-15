@@ -47,43 +47,47 @@ def convertFromScreenToWorld(screenCoords, secBounds, img_width):
 
 
 
-def extractAndLoadTilesFromSection(filename, params, screenCoords, r):
+def extractAndLoadTilesFromSection(filenames, params, screenCoords, r):
 
-    # assumes that the downsampled images are named after their z value
-    z = int(filename[len(params["downsampledImgPath"])+1:-4])
+    tsjsons = []
+    for f in filenames:
+        # assumes that the downsampled images are named after their z value
+        z = int(f[len(params["downsampledImgPath"])+1:-4])
 
-    # Get tile specs this is required to reupload sections with only selected tiles
-    tilespecs = renderapi.tilespec.get_tile_specs_from_z(
-        params["sourceStack"], z, render=r)
+        # Get tile specs this is required to reupload sections with only selected tiles
+        tilespecs = renderapi.tilespec.get_tile_specs_from_z(
+            params["sourceStack"], z, render=r)
 
-    # get section bounds
-    secBounds = renderapi.stack.get_bounds_from_z(
-        params["sourceStack"], z, render=r)
+        # get section bounds
+        secBounds = renderapi.stack.get_bounds_from_z(
+            params["sourceStack"], z, render=r)
 
-    # get section ID
-    sectionId = tilespecs[0].layout.sectionId
+        # get section ID
+        sectionId = tilespecs[0].layout.sectionId
 
-    img = cv2.imread(f)
-    img_width = img.shape[1]
+        img = cv2.imread(f)
+        img_width = img.shape[1]
 
-    worldCoords = convertFromScreenToWorld(screenCoords, secBounds, img_width)
+        worldCoords = convertFromScreenToWorld(screenCoords, secBounds, img_width)
 
-    try:
-        tilespecs_inside = select_tilespecs_inside_polygon(
-            worldCoords, tilespecs)
-    except IndexError:
-        print "no polygon defined for {}!".format(sectionId)
-        tilespecs_inside = tilespecs
+        try:
+            tilespecs_inside = select_tilespecs_inside_polygon(
+                worldCoords, tilespecs)
+        except IndexError:
+            print "no polygon defined for {}!".format(sectionId)
+            tilespecs_inside = tilespecs
 
-    # generate temporary json files
-    tempjson = tempfile.NamedTemporaryFile(
-        suffix='.json', mode='r', delete=False)
-    tempjson.close()
-    tsjson = tempjson.name
-    with open(tsjson, 'w') as f:
-        renderapi.utils.renderdump(tilespecs_inside, f)
+        # generate temporary json files
+        tempjson = tempfile.NamedTemporaryFile(
+            suffix='.json', mode='r', delete=False)
+        tempjson.close()
+        tsjson = tempjson.name
+        with open(tsjson, 'w') as f:
+            renderapi.utils.renderdump(tilespecs_inside, f)
 
-    return tsjson
+        tsjsons.append(tsjson)
+
+    return tsjsons
 
 
 
@@ -120,18 +124,21 @@ if __name__ == '__main__':
     screenCoords = []
     for i, f in enumerate(files):
         if (os.path.isfile(f)):
-            if ((i >= 0 and params["applyToAll"] == 0) or (i == 0 and params["applyToAll"] == 1)):
-                # set up the image canvas to show the downscaled image and get the polygon roi
-                canvasImage = imageCanvas(f)
+            #if ((i >= 0 and params["applyToAll"] == 0) or (i == 0 and params["applyToAll"] == 1)):
+            # set up the image canvas to show the downscaled image and get the polygon roi
+            canvasImage = imageCanvas(f)
 
-                # show the image to get some polygons on it
-                canvasImage.showImage()
+            # show the image to get some polygons on it
+            canvasImage.showImage()
 
-                # get the screen coordinates of the polygon
+            # get the screen coordinates of the polygon for the good section
+            try:
                 screenCoords = canvasImage.polygon[0].getScreenCoords()
+            except IndexError:
+                continue
 
-            tsjson = extractAndLoadTilesFromSection(f, params, screenCoords, r)
-            tsjsons.append(tsjson)
+    tsjsons = extractAndLoadTilesFromSection(files, params, screenCoords, r)
+    #tsjsons.append(tsjson)
 
     renderapi.stack.create_stack(targetStack, render=r)
     # upload tilespecs -- TODO add pool setup
