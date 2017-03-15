@@ -17,7 +17,7 @@ import argparse
 from imageCanvas import *
 from stackPointConversion import *
 
-sys.path.append('/home/gayathrim/libraries/render-python/renderapi')
+sys.path.append('/home/gayathrim/libraries/render-python')
 
 import renderapi
 
