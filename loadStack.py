@@ -17,6 +17,8 @@ import argparse
 from imageCanvas import *
 from stackPointConversion import *
 
+sys.path.append('/home/gayathrim/libraries/render-python/renderapi')
+
 import renderapi
 
 '''
@@ -108,8 +110,8 @@ if __name__ == '__main__':
         'port': 8080,
         'owner': params["owner"],
         'project': params["project"],
-        'client_scripts': '/data/em-131fs/code/render/render-ws-jave-client/src/main/scripts/',
-        memGB': '2G'
+        'client_scripts': '/data/em-131fs/code/render/render-ws-java-client/src/main/scripts/',
+        'memGB': '2G'
     }
 
     r = renderapi.connect(**render_connect)

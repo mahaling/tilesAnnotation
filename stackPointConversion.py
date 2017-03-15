@@ -19,8 +19,6 @@ def select_tilespecs_inside_polygon(polygonPoints, tilespecs):
                  bbpath.contains_point(tilecenter(ts))]
     return ts_inside
 
-def applyToAll
-
 
 class stackPointConversion():
     def getSectionBounds(self, stack, z):
