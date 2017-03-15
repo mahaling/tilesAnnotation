@@ -12,6 +12,7 @@ import matplotlib.pyplot as plt
 import matplotlib.path as mplpath
 import numpy as np
 import cv2
+from PIL import Image
 import glob
 import argparse
 from imageCanvas import *
@@ -71,8 +72,11 @@ def extractAndLoadTilesFromSection(filenames, params, screenCoords, r):
         # get section ID
         sectionId = tilespecs[0].layout.sectionId
 
-        img = cv2.imread(f)
-        img_width = img.shape[1]
+        # PIL doesn't read the entire image... We just need the image dimensions
+        with Image.open(filepath) as img:
+            img_width, img_height = img.size
+        #img = cv2.imread(f)
+        #img_width = img.shape[1]
 
         worldCoords = convertFromScreenToWorld(screenCoords, secBounds, img_width)
 
