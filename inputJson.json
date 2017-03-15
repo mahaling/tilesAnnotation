@@ -1,9 +1,11 @@
 {
-  "baseUrl":"http://em-131fs:8080/render-ws/v1",
+  "baseUrl":"http://em-131fs",
   "owner":"gayathri",
   "project":"EM_Phase1",
-  "stackname":"Phase1RawData_AIBS",
+  "sourceStack":"Phase1RawData_AIBS",
+  "targetStack":"PolygonTest",
   "downsampledImgPath":"/data/em-131fs/gayathri/downsampledSections",
+  "annotateAll":0,
   "imgExt":"jpg",
   "startZ":2267,
   "endZ":2267
