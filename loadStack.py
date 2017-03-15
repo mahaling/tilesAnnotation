@@ -138,7 +138,8 @@ if __name__ == '__main__':
                 screenCoords = canvasImage.polygon[0].getScreenCoords()
             except IndexError:
                 continue
-
+            break
+            
     tsjsons = extractAndLoadTilesFromSection(files, params, screenCoords, r)
     #tsjsons.append(tsjson)
 
