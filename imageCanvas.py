@@ -2,9 +2,7 @@
 import cv2
 import matplotlib.pyplot as plt
 from matplotlib.patches import Polygon
-#from matplotlib.Artist import artist
 from matplotlib.mlab import dist_point_to_segment
-#from matplotlib.line import Lines2D
 
 class Polygon():
     def __init__(self):
@@ -21,12 +19,12 @@ class Polygon():
         return self.worldCoords
 
 class imageCanvas():
-    def __init__(self,image):
+    def __init__(self, image):
         self.fname = image
         self.img = cv2.imread(self.fname)
         self.img_width = self.img.shape[1]
         self.img_height = self.img.shape[0]
-        #self.bounds = bounds
+        # self.bounds = bounds
         print self.img.shape
         self.point = ()
         self.polygon = []
@@ -55,43 +53,44 @@ class imageCanvas():
         plt.show()
         return self.point
 
-    def __onclick__(self,click):
-        self.point = (click.xdata,click.ydata)
+    def __onclick__(self, click):
+        self.point = (click.xdata, click.ydata)
         print self.point
         return self.point
 
-    def __motion_notify_callback(self,event):
+    def __motion_notify_callback(self, event):
         if event.inaxes:
             ax = event.inaxes
             x,y = event.xdata, event.ydata
-            if (event.button == None or event.button == 1) and self.line != None:
-                self.line.set_data([self.previous_point[0],x],
-                                    [self.previous_point[1],y])
+            if ((event.button == None or event.button == 1) and self.line is not None):
+                self.line.set_data([self.previous_point[0], x],
+                                   [self.previous_point[1], y])
                 self.fig.canvas.draw()
 
-    def __button_press_callback(self,event):
+    def __button_press_callback(self, event):
         if event.inaxes:
-            x,y = event.xdata,event.ydata
+            x = event.xdata
+            y = event.ydata
             ax = event.inaxes
-            if event.button == 1 and event.dblclick == False: # pressed the left button and it is a single click
+            if event.button == 1 and event.dblclick is False: # pressed the left button and it is a single click
                 if self.line == None: # if there is no line, create a line
                     self.newPoly = Polygon()
-                    self.line = plt.Line2D([x,x], [y,y], marker='o', color=self.newPoly.roicolor)
-                    self.previous_point = [x,y]
-                    self.newPoly.coords.append([x,y])
-                    self.newPoly.start_point = (x,y)
+                    self.line = plt.Line2D([x, x], [y, y], marker='o', color=self.newPoly.roicolor)
+                    self.previous_point = [x, y]
+                    self.newPoly.coords.append([x, y])
+                    self.newPoly.start_point = (x, y)
                     ax.add_line(self.line)
                     self.fig.canvas.draw()
                 else: # if there is a line, then create a line segment (the polygon is already initialized)
                     self.line = plt.Line2D([self.previous_point[0], x],
                                            [self.previous_point[1], y],
                                            marker='o', color=self.newPoly.roicolor)
-                    self.previous_point = [x,y]
-                    self.newPoly.coords.append([x,y])
+                    self.previous_point = [x, y]
+                    self.newPoly.coords.append([x, y])
                     event.inaxes.add_line(self.line)
                     self.fig.canvas.draw()
-            elif ((event.button == 1 and even.dblclick == True) or
-                  (event.button == 3 and event.dblclick == False)) and self.line != None:
+            elif ((event.button == 1 and even.dblclick is True) or
+                  (event.button == 3 and event.dblclick is False)) and self.line != None:
                   # add the polgon to the list of polygons
                   # complete the line connecting the start and the end point
                   # display the image
@@ -108,9 +107,9 @@ class imageCanvas():
 
     def __handle_close(self,event):
         print "Closing figure!"
-        #print self.polygon
+        # print self.polygon
 
-    def convertPolygonPointsToWorld(self,sectionBounds):
+    def convertPolygonPointsToWorld(self, sectionBounds):
         # converts the screen coordinates to world coordinates
         bounds_width = sectionBounds['maxX'] - sectionBounds['minX']
         bounds_height = sectionBounds['maxY'] - sectionBounds['minY']
@@ -128,4 +127,4 @@ class imageCanvas():
                     # convert the points to world coordinates
                     x = (x/scale) + sectionBounds['minX']
                     y = (y/scale) + sectionBounds['minY']
-                    self.polygon[i].worldCoords.append([x,y])
+                    self.polygon[i].worldCoords.append([x, y])
