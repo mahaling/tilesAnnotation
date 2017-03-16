@@ -55,7 +55,8 @@ def extractAndLoadTilesFromSection(filenames, params, screenCoords, r):
     tsjsons = []
     for f in filenames:
         # assumes that the downsampled images are named after their z value
-        z = int(f[len(params["downsampledImgPath"])+1:-4])
+        pos = f.rfind('/')
+        z = int(f[pos+1:-4])
 
         # do not write those sections that are not in the specified range
         if not (params["minZ"] <= z <= params["maxZ"]):
