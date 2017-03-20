@@ -2,12 +2,12 @@
   "baseUrl":"http://em-131fs",
   "owner":"gayathri",
   "project":"EM_Phase1",
-  "sourceStack":"Phase1RawData_AIBS",
-  "targetStack":"PolygonTest",
-  "downsampledImgPath":"/data/em-131fs/gayathri/downsampledSections",
-  "ext":"jpg",
+  "sourceStack":"manual_align_Phase1Data_3416_3465_Montage",
+  "targetStack":"PolygonTest4",
+  "downsampledImgPath":"/data/em-131fs/gayathri/downsampledSections/EM_Phase1/manual_align_Phase1Data_3416_3465_Montage",
+  "ext":"png",
   "annotateAll":0,
-  "imgExt":"jpg",
-  "minZ":2267,
-  "maxZ":2276
+  "imgExt":"png",
+  "minZ":3416,
+  "maxZ":3425
 }
