@@ -48,6 +48,33 @@ def convertFromScreenToWorld(screenCoords, secBounds, img_width):
 
     return worldCoords
 
+def extractAndLoadTilesUsingWorld(files, params, worldCoords, r):
+    tsjsons = []
+    for z in xrange(params["minZ"], params["maxZ"]+1):
+        print z
+        tilespecs = renderapi.tilespec.get_tile_specs_from_z(
+            params["sourceStack"], z, render=r)
+
+        sectionId = tilespecs[0].layout.sectionId
+
+        try:
+            tilespecs_inside = select_tilespecs_inside_polygon(
+                worldCoords, tilespecs)
+        except IndexError:
+            print "no polygon defined for {}!".format(sectionId)
+            tilespecs_inside = tilespecs
+
+        # generate temporary json files
+        tempjson = tempfile.NamedTemporaryFile(
+            suffix='.json', mode='r', delete=False)
+        tempjson.close()
+        tsjson = tempjson.name
+        with open(tsjson, 'w') as f:
+            renderapi.utils.renderdump(tilespecs_inside, f)
+
+        tsjsons.append(tsjson)
+
+    return tsjsons
 
 
 def extractAndLoadTilesFromSection(filenames, params, screenCoords, r):
@@ -133,7 +160,13 @@ if __name__ == '__main__':
 
     tsjsons = []
     screenCoords = []
+    worldCoords = []
+    width = []
+    z = []
     for i, f in enumerate(files):
+        # assumes that the downsampled images are named after their z value
+        z = int(f[len(params["downsampledImgPath"])+1:-4])
+
         if (os.path.isfile(f)):
             #if ((i >= 0 and params["applyToAll"] == 0) or (i == 0 and params["applyToAll"] == 1)):
             # set up the image canvas to show the downscaled image and get the polygon roi
@@ -145,15 +178,28 @@ if __name__ == '__main__':
             # get the screen coordinates of the polygon for the good section
             try:
                 screenCoords = canvasImage.polygon[0].getScreenCoords()
+                width = canvasImage.getImgWidth()
             except IndexError:
                 continue
             break
 
-    tsjsons = extractAndLoadTilesFromSection(files, params, screenCoords, r)
+    #tsjsons = extractAndLoadTilesFromSection(files, params, screenCoords, r)
+
+    # get section bounds
+    secBounds = renderapi.stack.get_bounds_from_z(
+                params["sourceStack"], z, render=r)
+
+
+    worldCoords = convertFromScreenToWorld(screenCoords, secBounds, width)
+
+    tsjsons = extractAndLoadTilesUsingWorld(files, params, worldCoords, r)
     #tsjsons.append(tsjson)
 
+    print "Creating target stack %s" % params["targetStack"]
     renderapi.stack.create_stack(params["targetStack"], render=r)
     # upload tilespecs -- TODO add pool setup
+
+    print "Uploading tilespecs to the target stack"
     renderapi.client.import_jsonfiles_parallel(
         params["targetStack"], tsjsons, poolsize=10, render=r)
     for tsjson in tsjsons:
