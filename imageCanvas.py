@@ -122,7 +122,9 @@ class imageCanvas():
     def getImgShape(self):
         return self.img.shape
 
-        
+    def getImgWidth(self):
+        return self.img_width
+
     def convertPolygonPointsToWorld(self, sectionBounds):
         # converts the screen coordinates to world coordinates
         bounds_width = sectionBounds['maxX'] - sectionBounds['minX']
